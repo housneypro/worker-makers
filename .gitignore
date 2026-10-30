@@ -1,3 +1,4 @@
+/docs/
 
 # Local environment and secrets
 .env
@@ -7,4 +8,10 @@
 # Local logs and OS files
 *.log
 .DS_Store
+.diagram-design
 Thumbs.db
+
+# Worker Makers development/runtime output
+__pycache__/
+*.pyc
+/.worker-makers/

@@ -1,0 +1,6 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "worker-makers",
+  "version": "0.1.0",
+  "description": "요구 정제부터 상세 계획, 직렬·병렬 개발까지 연결하는 Codex 스킬 도구함"
+}

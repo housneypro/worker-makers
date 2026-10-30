@@ -1,0 +1,32 @@
+{
+  "files": [
+    "plugin.json",
+    "distribution.json",
+    "LICENSE",
+    "skills/breif-maker/SKILL.md",
+    "skills/breif-maker/bundle.json",
+    "skills/breif-maker/scripts/wm.py",
+    "skills/breif-maker/scripts/file_snapshot.py",
+    "skills/breif-maker/references/clarification.md",
+    "skills/breif-maker/assets/brief.md",
+    "skills/goal-maker/SKILL.md",
+    "skills/goal-maker/bundle.json",
+    "skills/goal-maker/scripts/wm.py",
+    "skills/goal-maker/scripts/file_snapshot.py",
+    "skills/goal-maker/references/planning.md",
+    "skills/goal-maker/references/goal-contract.md",
+    "skills/goal-maker/assets/impl-plan.md",
+    "skills/work/SKILL.md",
+    "skills/work/bundle.json",
+    "skills/work/scripts/wm.py",
+    "skills/work/scripts/file_snapshot.py",
+    "skills/work/references/host-model.md",
+    "skills/work/references/execution.md",
+    "skills/work/references/quality.md",
+    "skills/work-parallel/SKILL.md",
+    "skills/work-parallel/bundle.json",
+    "skills/work-parallel/scripts/wm.py",
+    "skills/work-parallel/scripts/file_snapshot.py",
+    "skills/work-parallel/references/parallel.md"
+  ]
+}
