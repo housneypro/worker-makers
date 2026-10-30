@@ -10,7 +10,7 @@ import stat
 import tempfile
 import uuid
 
-PROJECT_EXCLUDES = {".git", ".worker-makers", ".codex", ".agents", ".ssh"}
+PROJECT_EXCLUDES = {".git", ".worker-makers", ".codex", ".agents", ".claude", ".ssh"}
 
 
 def is_link(path):

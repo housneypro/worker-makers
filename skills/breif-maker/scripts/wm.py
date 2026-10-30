@@ -252,7 +252,7 @@ def validate_goal(work):
             require(own not in {".", "./"} and not re.search(r"[*?\[]", own), "owns는 구체적인 파일/디렉터리 상대경로입니다")
             inside(project, own.rstrip("/"))
             normalized = Path(own.rstrip("/")).as_posix().casefold()
-            require(normalized.split("/")[0] not in {".git", ".worker-makers", ".codex", ".agents"}, "보호 자산은 일반 owns가 될 수 없습니다")
+            require(normalized.split("/")[0] not in {".git", ".worker-makers", ".codex", ".agents", ".claude"}, "보호 자산은 일반 owns가 될 수 없습니다")
             repo_path = project / repos[task["repo"]]["path"]
             owned_path = inside(repo_path, own.rstrip("/"))
             if repos[task["repo"]].get("kind") == "files":
@@ -858,7 +858,7 @@ def adopt_goal(store, state, authority):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Worker Makers 허브용 로컬 실행 도구 (agent spawn은 Codex 호스트가 수행)")
+    parser = argparse.ArgumentParser(description="Worker Makers 허브용 로컬 실행 도구 (agent spawn은 호스트가 수행)")
     sub = parser.add_subparsers(dest="command", required=True)
     p = sub.add_parser("init"); p.add_argument("--project", required=True); p.add_argument("--name", required=True)
     for command in ("validate-goal", "status", "ready", "start", "prepare", "dispatch", "report", "merge", "evidence", "gate", "complete", "retry", "clean", "repair", "reconcile-merge", "fail", "set-status", "adopt-goal", "task-policy", "set-stage"):

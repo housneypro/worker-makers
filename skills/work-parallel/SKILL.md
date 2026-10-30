@@ -17,4 +17,4 @@ work가 소유한 같은 run·허브·모델 정책·frozen 계획을 사용한�
 6. repo별 단일 통합 큐에서 merge한다. 결과 reported는 후행 task를 풀지 않으며 merged SHA와 phase 검증까지 기록해야 한다. 충돌은 원 소유자에게 반환한다. 다른 독립 task는 계속한다.
 7. 배치별 task/attempt·requested/resolved/confirmed model·커밋/통합 SHA·검증·충돌·잔여를 work 허브에 반환한다. 최종 리뷰/전체 완료/사용자 결정은 work가 소유한다.
 
-자체 오케스트레이션은 scheduler·소유권·상태·증거·통합 큐다. 에이전트 실행/메시지/대기는 실제 Codex 호스트를 사용하며 세션 밖 daemon이나 OS process manager를 제공한다고 주장하지 않는다.
+자체 오케스트레이션은 scheduler·소유권·상태·증거·통합 큐다. 에이전트 실행/메시지/대기는 실제 호스트를 사용하며 세션 밖 daemon이나 OS process manager를 제공한다고 주장하지 않는다.

@@ -1,6 +1,6 @@
 # worker-makers
 
-어떤 프로젝트에서도 요구 정제부터 상세 계획, 직렬·병렬 개발까지 연결하는 Codex 스킬 도구함입니다.
+어떤 프로젝트에서도 요구 정제부터 상세 계획, 직렬·병렬 개발까지 연결하는 Codex·Claude Code 스킬 도구함입니다.
 
 [개발자 홈페이지](https://housney.me)
 
@@ -98,12 +98,34 @@ worker는 지정한 task를 수행하고 질문·결과를 허브에 반환합�
 
 ## 요구 환경
 
-- 스킬·로컬 플러그인·프로젝트 설정을 지원하는 Codex. CLI 설치/탐색 검증 버전은 **0.164.0**입니다.
+- 다음 중 하나의 호스트
+  - 스킬·로컬 플러그인·프로젝트 설정을 지원하는 Codex. CLI 설치/탐색 검증 버전은 **0.164.0**입니다.
+  - 플러그인을 지원하는 Claude Code. 설치와 스킬 탐색 검증 버전은 **2.1.314**입니다.
 - Python **3.11+**: 외부 패키지나 `npm install`은 필요하지 않습니다.
 - Git 프로젝트는 branch/worktree, non-Git·최초 커밋 없는 프로젝트는 files 스냅샷을 사용합니다. 파일 사본과 백업을 저장할 로컬 파일 시스템은 hard link를 지원해야 합니다. 제품 언어/프레임워크는 제한하지 않습니다.
-- 개발 worker 실행: 명시적 모델·작업 경로·결과/종료를 관리할 수 있는 Codex 하위 에이전트 기능이 필요합니다. 모델 지정이 불가능하면 개발 기동을 보류합니다.
+- 개발 worker 실행: 명시적 모델·작업 경로·결과/종료를 관리할 수 있는 호스트의 하위 에이전트 기능이 필요합니다. 모델 지정이 불가능하면 개발 기동을 보류합니다. Claude Code는 하위 에이전트에 cwd 인자가 없어 [호스트 규약](skills/work/references/host-model.md)대로 절대경로로 지시하고 결과를 검사합니다.
 
-## Project scope — 플러그인
+## Claude Code — 플러그인
+
+저장소를 마켓플레이스로 등록하고 설치합니다. 현재 프로젝트에만 쓰려면 `--scope local`을 붙입니다. 생략하면 사용자 전체에 적용됩니다.
+
+```powershell
+claude plugin marketplace add housneypro/worker-makers --scope local
+claude plugin install worker-makers@worker-makers --scope local
+```
+
+이미 clone했다면 경로로 등록할 수 있습니다. 이 경우 플러그인을 clone 위치에서 직접 읽으므로 수정 내용이 다음 세션이나 `/reload-plugins` 후 바로 반영됩니다.
+
+```powershell
+claude plugin marketplace add ./worker-makers --scope local
+claude plugin install worker-makers@worker-makers --scope local
+```
+
+설치 후 새 세션을 열어 `/plugin` 또는 `claude plugin details worker-makers`로 확인합니다. 팀원과 함께 쓰려면 `--scope project`로 등록해 `.claude/settings.json`을 커밋합니다. 제거는 `claude plugin uninstall worker-makers@worker-makers --scope local`입니다.
+
+호출 이름과 옵션은 [사용](#사용)을 따릅니다.
+
+## Codex Project scope — 플러그인
 
 **대상 제품 프로젝트 root**에서 실행합니다.
 
@@ -125,7 +147,7 @@ python -X utf8 worker-makers/scripts/install-project.py --project . --register-o
 
 `--dry-run`은 변경 없이 검사합니다. `--register-only`는 캐시 없이 설정만 등록합니다. 설치 실패 시 오류를 확인하고 재실행하며 설정 등록만으로 스킬 사용이 확인됐다고 판단하지 않습니다. 프로젝트를 이동하면 기존 marketplace source의 절대경로를 새 root로 조정해야 합니다.
 
-## User scope — skill-installer
+## Codex User scope — skill-installer
 
 여러 프로젝트에서 개인 스킬로 쓰려면 Codex에 요청합니다.
 
@@ -140,13 +162,19 @@ installer의 기본 `$CODEX_HOME/skills`에 개별 스킬을 설치하며 플러
 
 ## 사용
 
-플러그인에서 확인한 호출 이름은 `worker-makers:<skill-name>`입니다.
+플러그인에서 확인한 호출 이름은 `worker-makers:<skill-name>`입니다. Claude Code에서는 아래 표기의 `$`를 `/`로 바꿉니다.
 
 ```text
 $worker-makers:breif-maker <정리할 요구>
 $worker-makers:goal-maker --from-brief <WORK_ROOT>/brief.md
 $worker-makers:work --from-goal <WORK_ROOT>/goal.md
 ```
+
+```text
+/worker-makers:work --from-goal <WORK_ROOT>/goal.md --worker-model sonnet
+```
+
+Claude Code의 `--worker-model`에는 하위 에이전트 모델 값인 `haiku`, `sonnet`, `opus`, `fable`을 씁니다.
 
 user scope는 `$breif-maker`, `$goal-maker`, `$work`로 호출합니다. 자연어로 역할을 요청해도 됩니다. `work` 단독 호출은 연결된 활성 run이나 유일한 합의 goal을 사용하며 임의로 최신 파일을 선택하지 않습니다.
 
@@ -158,7 +186,7 @@ $worker-makers:work --from-goal <goal.md> --serial --worker-model <개발-model-
 
 허브는 사용자가 이미 선택한 모델을 유지합니다. 실제 개발 worker는 명시적 모델을 사용하며, 선택이 없으면 기존 run/사용자가 저장한 기본값을 확인한 뒤 한 번 질문합니다. 저비용 개발 모델을 추천하되 reasoning·동시성·승격·리뷰 모델은 별개입니다. `--parallel`도 의존성·owns 충돌·phase 검증을 건너뛰지 않습니다.
 
-이 표기는 **Codex 스킬 입력**이며 `work`라는 셸 실행 파일을 설치하지 않습니다. 기계적 작업은 [Python 도구](skills/work/scripts/wm.py), agent 생성·질문·대기·검토는 Codex 허브가 담당합니다. 세션 밖 daemon은 제공하지 않습니다.
+이 표기는 **호스트의 스킬 입력**이며 `work`라는 셸 실행 파일을 설치하지 않습니다. 기계적 작업은 [Python 도구](skills/work/scripts/wm.py), agent 생성·질문·대기·검토는 호스트 세션의 허브가 담당합니다. 세션 밖 daemon은 제공하지 않습니다.
 
 ## 작업 공간
 
@@ -173,8 +201,9 @@ $worker-makers:work --from-goal <goal.md> --serial --worker-model <개발-model-
 
 ```text
 <project-root>/
-  .agents/plugins/marketplace.json
-  .codex/config.toml
+  .agents/plugins/marketplace.json  # Codex 설치 시
+  .codex/config.toml                # Codex 설치 시
+  .claude/settings.local.json       # Claude Code --scope local 설치 시
   worker-makers/                  # clone한 설치 원본
   .worker-makers/                 # 실행 산출물
     project.json
@@ -216,11 +245,12 @@ Git이 없거나 최초 커밋이 없으면 goal에 `kind: files`와 제품 파�
 python -X utf8 scripts/build.py
 python -X utf8 scripts/build.py --check
 python -X utf8 scripts/check.py
+claude plugin validate .
 git diff --check
 git status --short
 ```
 
-패키지 검사는 배포 파일 목록·스킬 메타데이터·독립 상대 참조·runtime/bundle 일치를 확인합니다.
+패키지 검사는 배포 파일 목록·스킬 메타데이터·독립 상대 참조·runtime/bundle 일치와 Codex·Claude 매니페스트의 버전 일치를 확인합니다.
 
 실행에 필요한 규약과 템플릿은 모두 `skills/`에 포함합니다.
 

@@ -5,6 +5,7 @@
 - 이 문서는 `worker-makers` 저장소의 작업 지침입니다.
 - `skills/`에 배포 스킬, `scripts/`에 설치·패키지 관리 도구가 있습니다. 실행 도구는 Python 3.11+ 표준 라이브러리를 사용합니다.
 - 실행 도구 정본은 `skills/work/scripts/`이며 변경 후 `python -X utf8 scripts/build.py`로 네 스킬의 복사본과 bundle을 동기화합니다.
+- Codex 매니페스트는 `plugin.json`, Claude Code 매니페스트는 `.claude-plugin/`에 있습니다. 버전을 올릴 때 두 `plugin.json`을 함께 고치고 build를 실행합니다.
 - 사용자 요청에 필요한 범위에서 변경하고, 기존 사용자 변경을 보존합니다.
 
 ## 변경 원칙
@@ -18,5 +19,5 @@
 ## 검증
 
 - 변경 후 `git status --short`와 `git diff --check`로 변경 범위와 공백 오류를 확인합니다.
-- 패키지 검증: `python -X utf8 scripts/check.py`.
+- 패키지 검증: `python -X utf8 scripts/check.py`, `claude plugin validate .`.
 - 실행 방법이나 지원 범위가 바뀌면 `README.md`를 함께 갱신하고 실제 수행한 검증 결과를 보고합니다.

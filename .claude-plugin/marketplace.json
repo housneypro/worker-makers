@@ -1,0 +1,15 @@
+{
+  "name": "worker-makers",
+  "description": "Worker Makers Claude Code 플러그인 마켓플레이스",
+  "owner": {
+    "name": "housney",
+    "url": "https://housney.me"
+  },
+  "plugins": [
+    {
+      "name": "worker-makers",
+      "source": "./",
+      "description": "요구 정제부터 상세 계획, 직렬·병렬 개발까지 연결하는 스킬 도구함"
+    }
+  ]
+}

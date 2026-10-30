@@ -1,0 +1,13 @@
+{
+  "name": "worker-makers",
+  "displayName": "Worker Makers",
+  "version": "0.1.2",
+  "description": "요구 정제부터 상세 계획, 직렬·병렬 개발까지 연결하는 스킬 도구함",
+  "author": {
+    "name": "housney",
+    "url": "https://housney.me"
+  },
+  "homepage": "https://github.com/housneypro/worker-makers",
+  "repository": "https://github.com/housneypro/worker-makers",
+  "license": "MIT"
+}

@@ -49,7 +49,7 @@ python <SKILL_ROOT>/scripts/file_snapshot.py --root <제품-root> --project --ex
 python <SKILL_ROOT>/scripts/file_snapshot.py --root <worker-cwd>
 ```
 
-첫 명령은 계획할 제품 지문, 둘째는 실제 worker 결과 지문이다. exclude는 필요할 때 반복한다. clone 소스·의존성·출력 폴더 등 제외할 실제 경로는 goal-maker가 계약에 기록한다. 제외 경로를 owns와 겹치게 정하지 않는다. Git metadata(디렉터리/파일 모두)·Codex 신뢰/인증 자산·실제 `.env`는 product 사본으로 옮기지 않는다.
+첫 명령은 계획할 제품 지문, 둘째는 실제 worker 결과 지문이다. exclude는 필요할 때 반복한다. clone 소스·의존성·출력 폴더 등 제외할 실제 경로는 goal-maker가 계약에 기록한다. 제외 경로를 owns와 겹치게 정하지 않는다. Git metadata(디렉터리/파일 모두)·호스트(Codex, Claude Code) 신뢰/인증 자산·실제 `.env`는 product 사본으로 옮기지 않는다.
 
 prepare는 staging에서 사본을 완성한 뒤 확정하고 메타데이터/원장 사이의 중단은 preparing intent로 재개한다. files backend의 worktree는 **격리 파일 사본**이며 Git branch가 아니다. 사본 부모의 도구용 Git 차단 metadata로 상위 원본 Git index의 암묵적 탐색을 막는다. worker는 Git 커밋 대신 파일 지문을 result에 기록한다. Python 검증은 `python -B` 등으로 불필요한 bytecode를 만들지 않고, 필요한 생성물은 실제 owns/계획된 검증 출력으로 명시한다. 파일 사본에 생긴 예상 밖 산출물을 조용히 무시하지 않는다.
 
