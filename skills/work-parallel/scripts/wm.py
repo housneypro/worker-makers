@@ -18,7 +18,7 @@ import tempfile
 import uuid
 from datetime import datetime, timezone
 
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 SCHEMA = 1
 SKILLS = ("breif-maker", "goal-maker", "work", "work-parallel")
 TERMINAL = {"merged", "cancelled"}
