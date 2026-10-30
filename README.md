@@ -2,11 +2,9 @@
 
 어떤 프로젝트에서도 요구 정제부터 상세 계획, 직렬·병렬 개발까지 연결하는 Codex 스킬 도구함입니다.
 
-```text
-breif-maker → goal-maker → work
-                            ├─ 직렬 개발 worker
-                            └─ work-parallel → 병렬 개발 worker → 직렬 통합
-```
+[개발자 홈페이지](https://housney.me)
+
+![요구 정제부터 상세 계획과 직렬·병렬 개발까지의 전체 흐름](assets/workflows/overview.svg)
 
 | 스킬 | 책임 |
 |---|---|
@@ -18,6 +16,85 @@ breif-maker → goal-maker → work
 `breif-maker`는 확정된 이름이고 산출물은 `brief.md`입니다. 계획 중 요구 의문은 goal-maker가 breif-maker의 질의응답 모드로 근거를 확인하고, 필요한 사용자 선택만 질문합니다.
 
 goal-maker는 합의 목표를 충족하는 최소 변경을 계획합니다. 각 기술 결정에 재사용 판정을 남기고, 신규 구조·의존성은 실제 후보와 변경·회귀·운영 부담을 비교해 필요성이 입증될 때만 도입합니다. 미래 확장이나 인접 정리를 이유로 범위를 늘리지 않으며 phase·검증은 실제 의존성과 완료 기준에 대응해야 합니다. 상세 impl-plan은 구현을 복잡하게 만드는 대신 worker가 판단을 추측할 여지를 줄입니다.
+
+## 워크플로우
+
+요구 합의는 breif-maker, 기술 계획은 goal-maker, 개발 실행과 완료 판정은 work가 담당합니다. 세부 흐름은 아래에서 펼쳐 볼 수 있습니다.
+
+<details>
+<summary>요구 정제·계획 작성·질문 해소·수렴 루프</summary>
+
+### 요구 정제
+
+기존 합의를 재사용하고, 필요한 선택만 확인해 brief로 정리합니다. 타당성 조사만 요청한 경우에는 조사 결과로 마칩니다.
+
+![breif-maker의 요구 정제와 합의 흐름](assets/workflows/breif-maker.svg)
+
+### 순차 계획 파이프라인
+
+plans가 수렴한 뒤 spec, spec이 수렴한 뒤 상세 impl_plans를 작성합니다. 단계 내부의 독립 작성·리뷰는 병렬로 진행할 수 있습니다. 신규 도입에는 재사용 판정과 비교 근거가 필요합니다.
+
+![goal-maker의 조사와 단계별 수렴 배리어](assets/workflows/goal-maker.svg)
+
+### 계획 중 질문 해소
+
+기술 판단은 goal-maker가 조사하고, 요구 의문은 breif-maker가 기존 근거를 확인합니다. 새 사용자 결정이 필요하면 허브가 질문하고, 답변 후 영향 계획부터 재개합니다.
+
+![계획 중 질문 분류와 근거 확인 및 사용자 질의 루프](assets/workflows/clarification.svg)
+
+### 관점별 리뷰와 수렴
+
+정합성·최소성·완결성·구현가능성을 검토합니다. 목표에 불필요한 확장은 backlog로 분리하고, 필요한 수정과 계약 보정을 마친 뒤 다음 단계로 넘깁니다.
+
+![문서 결함과 확장 제안을 구분하는 계획 수렴 루프](assets/workflows/convergence.svg)
+
+</details>
+
+<details>
+<summary>work 실행 분기·개발 모델 선택·병렬 통합</summary>
+
+### goal 인계부터 전체 완료까지
+
+허브는 합의된 goal과 선행조건을 확인하고 개발 worker의 모델을 정합니다. 직렬·병렬 실행 모두 개발 worker에게 위임하며, 통합 결과의 리뷰·검증과 다음 phase 진행은 같은 허브가 관리합니다.
+
+![work의 goal 인계와 직렬·병렬 실행 및 리뷰·검증 흐름](assets/workflows/work.svg)
+
+### worker 모델 정책
+
+이번 호출의 명시 옵션, 동일 run의 기록, 사용자가 저장한 기본값 순으로 확인하고 없을 때만 한 번 질문합니다. 모델·reasoning·동시성·승격 권한을 따로 관리하며 허브 모델은 유지합니다.
+
+![개발 worker 모델 선택과 막힘 원인별 처리](assets/workflows/worker-model.svg)
+
+### 병렬 실행과 직렬 통합
+
+통합된 deps와 phase gate를 만족하고 owns·자원이 충돌하지 않는 task만 동시에 시작합니다. 결과 메시지 외에 실제 종료·diff·현재 attempt·커밋 또는 파일 지문을 확인하고, 저장소별로 한 건씩 통합합니다.
+
+![work-parallel의 ready 작업 배치와 결과 회수 및 직렬 통합](assets/workflows/work-parallel.svg)
+
+</details>
+
+<details>
+<summary>허브 통신·태스크 상태·공유 계약 의존</summary>
+
+### 하나의 허브에서 질문과 결과 수집
+
+worker는 지정한 task를 수행하고 질문·결과를 허브에 반환합니다. 필요한 사용자 결정과 중앙 원장 갱신, 최종 보고는 work가 맡습니다.
+
+![사용자와 work 허브 및 worker 사이의 메시지 순서](assets/workflows/hub.svg)
+
+### 준비·실행·보고·통합 상태
+
+준비 intent를 먼저 기록하고 사본과 packet을 확정한 뒤 worker를 기동합니다. preparing에서 중단되면 같은 attempt로 이어가며, 검사된 결과도 실제 통합이 끝나야 merged가 됩니다. 실패와 통합 충돌은 원인·현재 상태를 확인한 뒤 재시도합니다.
+
+![preparing과 prepared를 포함한 실제 태스크 상태 및 복구 흐름](assets/workflows/task-state.svg)
+
+### 공유 계약이 있는 작업의 병렬 경계
+
+공유 계약을 먼저 고정하고 독립 구현을 병렬로 진행합니다. 소비자의 실제 계약 통합은 제공자 결과와 계약 수용을 확인한 뒤 시작합니다.
+
+![계약 고정과 제공자·소비자 구현의 병렬 및 순차 경계](assets/workflows/contract.svg)
+
+</details>
 
 ## 요구 환경
 
@@ -84,6 +161,15 @@ $worker-makers:work --from-goal <goal.md> --serial --worker-model <개발-model-
 이 표기는 **Codex 스킬 입력**이며 `work`라는 셸 실행 파일을 설치하지 않습니다. 기계적 작업은 [Python 도구](skills/work/scripts/wm.py), agent 생성·질문·대기·검토는 Codex 허브가 담당합니다. 세션 밖 daemon은 제공하지 않습니다.
 
 ## 작업 공간
+
+<details>
+<summary>프로젝트 설치·작업별 공간·코드 격리 구조</summary>
+
+프로젝트 등록·설치 자산과 작업 산출물을 분리합니다. 허브와 worker는 최초 PROJECT_ROOT와 WORK_ROOT를 공유하며 코드 변경은 integration/task worktree에서 수행합니다. files backend에서는 같은 위치에 격리 사본을 둡니다.
+
+![프로젝트 설치 자산과 작업별 문서·원장·개발 및 통합 공간의 분리](assets/workflows/workspace.svg)
+
+</details>
 
 ```text
 <project-root>/
