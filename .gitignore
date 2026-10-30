@@ -1,0 +1,10 @@
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Local logs and OS files
+*.log
+.DS_Store
+Thumbs.db
